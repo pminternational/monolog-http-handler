@@ -6,6 +6,7 @@ use Http\Client\HttpAsyncClient;
 use Http\Discovery\HttpAsyncClientDiscovery;
 use Http\Discovery\MessageFactoryDiscovery;
 use Http\Message\MessageFactory;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
@@ -62,7 +63,7 @@ class HttpHandler extends AbstractProcessingHandler
      * @param  boolean              $bubble  Whether the messages that are handled can bubble up the stack or not.
      */
 	public function __construct(
-		array $options,
+		array $options = [],
 		HttpAsyncClient $client = null,
 		MessageFactory $factory = null,
 		$level = Logger::DEBUG,
@@ -92,10 +93,10 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Sets the uri.
 	 *
-	 * @param  string $uri
+	 * @param  string|null $uri
 	 * @return \Msschl\Monolog\Handler\HttpHandler
 	 */
-	public function setUri($uri)
+	public function setUri(string $uri = null)
 	{
 		$this->options['uri'] = $uri;
 
@@ -105,7 +106,7 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Gets the uri.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function getUri()
 	{
@@ -118,7 +119,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 * @param  string $method
 	 * @return \Msschl\Monolog\Handler\HttpHandler
 	 */
-	public function setMethod($method)
+	public function setMethod(string $method)
 	{
 		$this->options['method'] = $method;
 
@@ -130,7 +131,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 *
 	 * @return string
 	 */
-	public function getMethod()
+	public function getMethod() : string
 	{
 		return $this->options['method'] ?: 'GET';
 	}
@@ -164,7 +165,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 * @param  string $version
 	 * @return \Msschl\Monolog\Handler\HttpHandler
 	 */
-	public function setProtocolVersion($version = '1.1')
+	public function setProtocolVersion(string $version = '1.1')
 	{
 		$this->options['protocolVersion'] = $version;
 
@@ -176,7 +177,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 *
 	 * @return string
 	 */
-	public function getProtocolVersion()
+	public function getProtocolVersion() : string
 	{
 		return $this->options['protocolVersion'] ?: '1.1';
 	}
@@ -186,7 +187,7 @@ class HttpHandler extends AbstractProcessingHandler
      *
      * @return \Monolog\Formatter\JsonFormatter
      */
-    protected function getDefaultFormatter()
+    protected function getDefaultFormatter() : FormatterInterface
     {
         return new JsonFormatter();
     }
