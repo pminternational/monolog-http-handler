@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/msschl/monolog-http-handler.svg?branch=master)](https://travis-ci.org/msschl/monolog-http-handler)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/msschl/monolog-http-handler/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/msschl/monolog-http-handler/?branch=master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/msschl/monolog-http-handler/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 [![Coverage Status](https://coveralls.io/repos/github/msschl/monolog-http-handler/badge.svg?branch=master)](https://coveralls.io/github/msschl/monolog-http-handler?branch=master)
 
 # Monolog Http Handler
