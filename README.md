@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/msschl/monolog-http-handler.svg?branch=master)](https://travis-ci.org/msschl/monolog-http-handler)
+
 # Monolog Http Handler
 
 This package provides a HttpHandler for the [Monolog](https://github.com/Seldaek/monolog) library.
