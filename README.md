@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/msschl/monolog-http-handler.svg?branch=master)](https://travis-ci.org/msschl/monolog-http-handler)
+[![Coverage Status](https://coveralls.io/repos/github/msschl/monolog-http-handler/badge.svg?branch=master)](https://coveralls.io/github/msschl/monolog-http-handler?branch=master)
 
 # Monolog Http Handler
 
