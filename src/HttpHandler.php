@@ -25,7 +25,7 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * The http client instance.
 	 *
-     * @var \Http\Client\HttpClient
+     * @var \Http\Client\HttpAsyncClient
      */
     protected $client;
 
