@@ -260,8 +260,9 @@ class HttpHandler extends AbstractProcessingHandler
 
     	try {
     		$this->getHttpClient()->sendRequest($request);
-    	} catch (Exception $e) {
+    	} catch (\Exception $e) {
     		// QUESTION(msschl): How to handle the thrown exceptions???
+    		return;
     	}
     }
 }
