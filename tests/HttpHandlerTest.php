@@ -3,6 +3,8 @@
 namespace Msschl\Monolog\Handler\Tests\HttpHandler;
 
 use Http\Mock\Client;
+use Monolog\Formatter\FormatterInterface;
+use Monolog\Handler\BufferHandler;
 use Monolog\Logger;
 use Msschl\Monolog\Handler\HttpHandler;
 use PHPUnit\Framework\TestCase;
@@ -143,6 +145,43 @@ class HttpHandlerTest extends TestCase
 		$this->assertSame($expected, $this->handler->getProtocolVersion());
 	}
 
+	public function testHandleBatch()
+	{
+		$stub = $this->createMock(FormatterInterface::class, ['format', 'formatBatch']);
+
+		$stub->method('formatBatch')->willReturn(array());
+
+		$log = new Logger('logger');
+
+		$this->handler->setFormatter($stub);
+
+		$log->pushHandler(new BufferHandler($this->handler, 3, Logger::DEBUG, true, true));
+
+		$stub->expects($this->once())->method('formatBatch');
+		$stub->expects($this->exactly(0))->method('format');
+
+		$log->error('first');
+		$log->error('second');
+		$log->error('third');
+		$log->error('fourth');
+	}
+
+	public function testHandleBatchGetsCalled()
+	{
+		$stub = $this->createMock(HttpHandler::class, ['handleBatch']);
+
+		$log = new Logger('logger');
+
+		$log->pushHandler(new BufferHandler($stub, 3, Logger::DEBUG, true, true));
+
+		$stub->expects($this->once())->method('handleBatch');
+
+		$log->error('first');
+		$log->error('second');
+		$log->error('third');
+		$log->error('fourth');
+	}
+
 	public function testSendHttpRequest()
 	{
 		$stub = $this->createMock(RequestInterface::class);
@@ -162,6 +201,23 @@ class HttpHandlerTest extends TestCase
 	public function testDoNotSendHttpRequestOnEmptyUri()
 	{
 		$stub = $this->createMock(RequestInterface::class);
+
+		$log = new Logger('logger');
+
+		$log->pushHandler($this->handler);
+
+		$log->error('Bar');
+
+		$this->assertNotSame($stub, $this->client->getLastRequest());
+		$this->assertSame(false, $this->client->getLastRequest());
+	}
+
+	public function testSendHttpRequestAndCatchException()
+	{
+		$stub = $this->createMock(RequestInterface::class);
+
+		$exception = new \Exception('Whoops!');
+		$this->client->addException($exception);
 
 		$log = new Logger('logger');
 
