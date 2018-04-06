@@ -2,8 +2,8 @@
 
 namespace Msschl\Monolog\Handler;
 
-use Http\Client\HttpAsyncClient;
-use Http\Discovery\HttpAsyncClientDiscovery;
+use Http\Client\HttpClient;
+use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\MessageFactoryDiscovery;
 use Http\Message\MessageFactory;
 use Monolog\Formatter\FormatterInterface;
@@ -25,7 +25,7 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * The http client instance.
 	 *
-     * @var \Http\Client\HttpAsyncClient
+     * @var \Http\Client\HttpClient
      */
     protected $client;
 
@@ -55,8 +55,8 @@ class HttpHandler extends AbstractProcessingHandler
      *
      * @param  array                $options The array of options consisting of the uri, method, headers and protocol
      *                                       version.
-     * @param  HttpAsyncClient|null $client  An instance of a psr-7 http async client implementation or null when the
-     *                                       HttpAsyncClientDiscovery should be used to find an instance.
+     * @param  HttpClient|null      $client  An instance of a psr-7 http client implementation or null when the
+     *                                       HttpClientDiscovery should be used to find an instance.
      * @param  MessageFactory|null  $factory An instance of a psr-7 message factory implementation or null when
      *                                       the MessageFactoryDiscovery should be used to find an instance.
      * @param  int                  $level   The minimum logging level at which this handler will be triggered.
@@ -64,12 +64,12 @@ class HttpHandler extends AbstractProcessingHandler
      */
 	public function __construct(
 		array $options = [],
-		HttpAsyncClient $client = null,
+		HttpClient $client = null,
 		MessageFactory $factory = null,
 		$level = Logger::DEBUG,
 		$bubble = true
 	) {
-		$this->client = $client ?: HttpAsyncClientDiscovery::find();
+		$this->client = $client ?: HttpClientDiscovery::find();
 		$this->messageFactory = $factory ?: MessageFactoryDiscovery::find();
 
 		$this->setOptions($options);
@@ -195,9 +195,9 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
      * Returns the HTTP adapter.
      *
-     * @return \Http\Client\HttpAsyncClient
+     * @return \Http\Client\HttpClient
      */
-    protected function getHttpClient(): HttpAsyncClient
+    protected function getHttpClient(): HttpClient
     {
         return $this->client;
     }
@@ -234,6 +234,10 @@ class HttpHandler extends AbstractProcessingHandler
     		$this->getProtocolVersion()
     	);
 
-        $this->getHttpClient()->sendAsyncRequest($request);
+    	try {
+    		$this->getHttpClient()->sendRequest($request);
+    	} catch (Exception $e) {
+    		// QUESTION(msschl): How to handle the thrown exceptions???
+    	}
     }
 }
