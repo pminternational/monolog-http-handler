@@ -183,6 +183,30 @@ class HttpHandler extends AbstractProcessingHandler
 	}
 
 	/**
+	 * Handles a set of records at once.
+	 *
+	 * @param  array  $records The records to handle (an array of record arrays)
+	 * @return bool
+	 */
+	public function handleBatch(array $records)
+	{
+		foreach ($records as $key => $record) {
+	        if ($this->isHandling($record)) {
+	        	$record = $this->processRecord($record);
+	    		$records['records'][] = $record;
+	    	}
+
+			unset($records[$key]);
+	    }
+
+	    $records['formatted'] = $this->getFormatter()->formatBatch($records['records'] ?? []);
+
+	    $this->write($records);
+
+	    return false === $this->bubble;
+	}
+
+	/**
      * Gets the default formatter.
      *
      * @return \Monolog\Formatter\JsonFormatter
