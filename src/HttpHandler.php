@@ -2,10 +2,11 @@
 
 namespace Msschl\Monolog\Handler;
 
-use Http\Client\HttpAsyncClient;
-use Http\Discovery\HttpAsyncClientDiscovery;
+use Http\Client\HttpClient;
+use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\MessageFactoryDiscovery;
 use Http\Message\MessageFactory;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
@@ -54,21 +55,21 @@ class HttpHandler extends AbstractProcessingHandler
      *
      * @param  array                $options The array of options consisting of the uri, method, headers and protocol
      *                                       version.
-     * @param  HttpAsyncClient|null $client  An instance of a psr-7 http async client implementation or null when the
-     *                                       HttpAsyncClientDiscovery should be used to find an instance.
+     * @param  HttpClient|null      $client  An instance of a psr-7 http client implementation or null when the
+     *                                       HttpClientDiscovery should be used to find an instance.
      * @param  MessageFactory|null  $factory An instance of a psr-7 message factory implementation or null when
      *                                       the MessageFactoryDiscovery should be used to find an instance.
      * @param  int                  $level   The minimum logging level at which this handler will be triggered.
      * @param  boolean              $bubble  Whether the messages that are handled can bubble up the stack or not.
      */
 	public function __construct(
-		array $options,
-		HttpAsyncClient $client = null,
+		array $options = [],
+		HttpClient $client = null,
 		MessageFactory $factory = null,
 		$level = Logger::DEBUG,
 		$bubble = true
 	) {
-		$this->client = $client ?: HttpAsyncClientDiscovery::find();
+		$this->client = $client ?: HttpClientDiscovery::find();
 		$this->messageFactory = $factory ?: MessageFactoryDiscovery::find();
 
 		$this->setOptions($options);
@@ -92,10 +93,10 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Sets the uri.
 	 *
-	 * @param  string $uri
+	 * @param  string|null $uri
 	 * @return \Msschl\Monolog\Handler\HttpHandler
 	 */
-	public function setUri($uri)
+	public function setUri(string $uri = null)
 	{
 		$this->options['uri'] = $uri;
 
@@ -105,7 +106,7 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Gets the uri.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function getUri()
 	{
@@ -118,7 +119,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 * @param  string $method
 	 * @return \Msschl\Monolog\Handler\HttpHandler
 	 */
-	public function setMethod($method)
+	public function setMethod(string $method)
 	{
 		$this->options['method'] = $method;
 
@@ -130,7 +131,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 *
 	 * @return string
 	 */
-	public function getMethod()
+	public function getMethod() : string
 	{
 		return $this->options['method'] ?: 'GET';
 	}
@@ -164,7 +165,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 * @param  string $version
 	 * @return \Msschl\Monolog\Handler\HttpHandler
 	 */
-	public function setProtocolVersion($version = '1.1')
+	public function setProtocolVersion(string $version = '1.1')
 	{
 		$this->options['protocolVersion'] = $version;
 
@@ -176,9 +177,33 @@ class HttpHandler extends AbstractProcessingHandler
 	 *
 	 * @return string
 	 */
-	public function getProtocolVersion()
+	public function getProtocolVersion() : string
 	{
 		return $this->options['protocolVersion'] ?: '1.1';
+	}
+
+	/**
+	 * Handles a set of records at once.
+	 *
+	 * @param  array  $records The records to handle (an array of record arrays)
+	 * @return bool
+	 */
+	public function handleBatch(array $records)
+	{
+		foreach ($records as $key => $record) {
+	        if ($this->isHandling($record)) {
+	        	$record = $this->processRecord($record);
+	    		$records['records'][] = $record;
+	    	}
+
+			unset($records[$key]);
+	    }
+
+	    $records['formatted'] = $this->getFormatter()->formatBatch($records['records'] ?? []);
+
+	    $this->write($records);
+
+	    return false === $this->bubble;
 	}
 
 	/**
@@ -186,7 +211,7 @@ class HttpHandler extends AbstractProcessingHandler
      *
      * @return \Monolog\Formatter\JsonFormatter
      */
-    protected function getDefaultFormatter()
+    protected function getDefaultFormatter() : FormatterInterface
     {
         return new JsonFormatter();
     }
@@ -194,9 +219,9 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
      * Returns the HTTP adapter.
      *
-     * @return \Http\Client\HttpAsyncClient
+     * @return \Http\Client\HttpClient
      */
-    protected function getHttpClient(): HttpAsyncClient
+    protected function getHttpClient(): HttpClient
     {
         return $this->client;
     }
@@ -233,6 +258,11 @@ class HttpHandler extends AbstractProcessingHandler
     		$this->getProtocolVersion()
     	);
 
-        $this->getHttpClient()->sendAsyncRequest($request);
+    	try {
+    		$this->getHttpClient()->sendRequest($request);
+    	} catch (\Exception $e) {
+    		// QUESTION(msschl): How to handle the thrown exceptions???
+    		return;
+    	}
     }
 }
