@@ -51,7 +51,7 @@ class HttpHandler extends AbstractProcessingHandler
     ];
 
     /**
-     * Create a new monolog http client handler instance.
+     * Initializes a new instance of the {@see HttpHandler} class.
      *
      * @param  array                $options The array of options consisting of the uri, method, headers and protocol
      *                                       version.
@@ -80,8 +80,8 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Sets the options for the monolog http handler.
 	 *
-	 * @param  array $options
-	 * @return \Msschl\Monolog\Handler\HttpHandler
+	 * @param  array $options The array of options.
+	 * @return self
 	 */
 	public function setOptions(array $options)
 	{
@@ -93,8 +93,8 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Sets the uri.
 	 *
-	 * @param  string|null $uri
-	 * @return \Msschl\Monolog\Handler\HttpHandler
+	 * @param  string|null $uri Sets the http server uri or null to disable the {@see HttpHandler}.
+	 * @return self
 	 */
 	public function setUri(string $uri = null)
 	{
@@ -116,8 +116,8 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Sets the http method.
 	 *
-	 * @param  string $method
-	 * @return \Msschl\Monolog\Handler\HttpHandler
+	 * @param  string $method The http method e.g. 'GET'.
+	 * @return self
 	 */
 	public function setMethod(string $method)
 	{
@@ -133,14 +133,14 @@ class HttpHandler extends AbstractProcessingHandler
 	 */
 	public function getMethod() : string
 	{
-		return $this->options['method'] ?: 'GET';
+		return $this->options['method'] ?? 'GET';
 	}
 
 	/**
-	 * Sets the headers.
+	 * Sets the headers array. Overrides all existing header key and value pairs.
 	 *
-	 * @param  array $headers
-	 * @return \Msschl\Monolog\Handler\HttpHandler
+	 * @param  array $headers The headers array.
+	 * @return self
 	 */
 	public function setHeaders(array $headers)
 	{
@@ -156,14 +156,60 @@ class HttpHandler extends AbstractProcessingHandler
 	 */
 	public function getHeaders() : array
 	{
-		return $this->options['headers'] ?: [ 'Content-Type' => 'application/json' ];
+		return $this->options['headers'] ?? [ 'Content-Type' => 'application/json' ];
+	}
+
+	/**
+	 * Gets a value for a specific header key.
+	 *
+	 * @param  string $key The header key.
+	 * @return string|null
+	 */
+	public function getHeader(string $key)
+	{
+		return $this->getHeaders()[$key] ?? null;
+	}
+
+	/**
+	 * Pushes a header value onto the headers array.
+	 *
+	 * @param  string $key   The header key.
+	 * @param  string $value The header value.
+	 * @return self
+	 */
+	public function pushHeader(string $key, string $value)
+	{
+		$headers = $this->getHeaders();
+
+		$headers[$key] = $value;
+
+		$this->setHeaders($headers);
+
+		return $this;
+	}
+
+	/**
+	 * Pops a header value from the headers array.
+	 *
+	 * @param  string $key The header key.
+	 * @return string|null
+	 */
+	public function popHeader(string $key)
+	{
+		$value = $this->getHeader($key);
+
+		if ($value !== null) {
+			unset($this->options['headers'][$key]);
+		}
+
+		return $value;
 	}
 
 	/**
 	 * Sets the http protocol version.
 	 *
-	 * @param  string $version
-	 * @return \Msschl\Monolog\Handler\HttpHandler
+	 * @param  string $version The http protocol version.
+	 * @return self
 	 */
 	public function setProtocolVersion(string $version = '1.1')
 	{
@@ -179,7 +225,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 */
 	public function getProtocolVersion() : string
 	{
-		return $this->options['protocolVersion'] ?: '1.1';
+		return $this->options['protocolVersion'] ?? '1.1';
 	}
 
 	/**
