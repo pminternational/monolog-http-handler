@@ -132,6 +132,50 @@ class HttpHandlerTest extends TestCase
 		$this->assertSame($expected, $this->handler->getHeaders());
 	}
 
+	public function testGetHeader()
+	{
+		$key = 'Content-Type';
+		$noneExistingKey = 'foo';
+		$expectedValue = 'application/xml';
+		$array = [$key => $expectedValue];
+
+		$this->handler->setHeaders($array);
+
+		$this->assertTrue(is_string($this->handler->getHeader($key)));
+		$this->assertSame($expectedValue, $this->handler->getHeader($key));
+
+		$this->assertNull($this->handler->getHeader($noneExistingKey));
+	}
+
+	public function testPushHeaderAndReturnsSelfInstance()
+	{
+		$key = 'Content-Type';
+		$expectedValue = 'application/xml';
+
+		$returnValue = $this->handler->pushHeader($key, $expectedValue);
+
+		$this->assertInstanceOf(HttpHandler::class, $returnValue);
+		$this->assertSame($this->handler, $returnValue);
+
+		$this->assertTrue(is_string($this->handler->getHeader($key)));
+		$this->assertSame($expectedValue, $this->handler->getHeader($key));
+	}
+
+	public function testPopHeader()
+	{
+		$key = 'Content-Type';
+		$expectedValue = 'application/xml';
+
+		$this->handler->pushHeader($key, $expectedValue);
+
+		$returnValue = $this->handler->popHeader($key);
+
+		$this->assertTrue(is_string($returnValue));
+		$this->assertSame($expectedValue, $returnValue);
+
+		$this->assertNull($this->handler->popHeader($key));
+	}
+
 	public function testSetProtocolVersionAndReturnsSelfInstance()
 	{
 		$expected = '1.0';
