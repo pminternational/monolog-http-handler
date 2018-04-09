@@ -1,6 +1,6 @@
 <?php
 
-namespace Msschl\Monolog\Handler\Tests\HttpHandler;
+namespace Msschl\Monolog\Handler\Tests;
 
 use Http\Mock\Client;
 use Monolog\Formatter\FormatterInterface;
@@ -11,8 +11,13 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 
 /**
-*
-*/
+ * This file is part of the msschl\monolog-http-handler package.
+ *
+ * Copyright (c) 2018 Markus Schlotbohm
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
 class HttpHandlerTest extends TestCase
 {
 
@@ -135,9 +140,11 @@ class HttpHandlerTest extends TestCase
 	public function testGetHeader()
 	{
 		$key = 'Content-Type';
-		$noneExistingKey = 'foo';
 		$expectedValue = 'application/xml';
 		$array = [$key => $expectedValue];
+
+		$noneExistingKey = 'foo';
+		$nullKey = null;
 
 		$this->handler->setHeaders($array);
 
@@ -145,6 +152,7 @@ class HttpHandlerTest extends TestCase
 		$this->assertSame($expectedValue, $this->handler->getHeader($key));
 
 		$this->assertNull($this->handler->getHeader($noneExistingKey));
+		$this->assertNull($this->handler->getHeader($nullKey));
 	}
 
 	public function testPushHeaderAndReturnsSelfInstance()
@@ -166,6 +174,9 @@ class HttpHandlerTest extends TestCase
 		$key = 'Content-Type';
 		$expectedValue = 'application/xml';
 
+		$noneExistingKey = 'foo';
+		$nullKey = null;
+
 		$this->handler->pushHeader($key, $expectedValue);
 
 		$returnValue = $this->handler->popHeader($key);
@@ -174,6 +185,9 @@ class HttpHandlerTest extends TestCase
 		$this->assertSame($expectedValue, $returnValue);
 
 		$this->assertNull($this->handler->popHeader($key));
+
+		$this->assertNull($this->handler->popHeader($noneExistingKey));
+		$this->assertNull($this->handler->popHeader($nullKey));
 	}
 
 	public function testSetProtocolVersionAndReturnsSelfInstance()
@@ -281,5 +295,6 @@ class HttpHandlerTest extends TestCase
 	protected function tearDown()
 	{
 		$this->handler = null;
+		$this->client = null;
 	}
 }
