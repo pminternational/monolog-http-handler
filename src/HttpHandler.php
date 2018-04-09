@@ -162,10 +162,10 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Gets a value for a specific header key.
 	 *
-	 * @param  string $key The header key.
+	 * @param  string|null $key The header key.
 	 * @return string|null
 	 */
-	public function getHeader(string $key)
+	public function getHeader(string $key = null)
 	{
 		return $this->getHeaders()[$key] ?? null;
 	}
@@ -191,10 +191,10 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Pops a header value from the headers array.
 	 *
-	 * @param  string $key The header key.
+	 * @param  string|null $key The header key.
 	 * @return string|null
 	 */
-	public function popHeader(string $key)
+	public function popHeader(string $key = null)
 	{
 		$value = $this->getHeader($key);
 
