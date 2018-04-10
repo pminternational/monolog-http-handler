@@ -162,22 +162,39 @@ class HttpHandler extends AbstractProcessingHandler
 	/**
 	 * Gets a value for a specific header key.
 	 *
-	 * @param  string|null $key The header key.
-	 * @return string|null
+	 * @param  string|null $key     The header key.
+	 * @param  string|null $default A default value or null
+	 * @return string|$default
 	 */
-	public function getHeader(string $key = null)
+	public function getHeader(string $key = null, string $default = null)
 	{
-		return $this->getHeaders()[$key] ?? null;
+		return $this->getHeaders()[$key] ?? $default;
+	}
+
+	/**
+	 * Returns whether a header exists or not.
+	 *
+	 * @param  string|null $key The header key.
+	 * @return bool
+	 */
+	public function hasHeader(string $key = null)
+	{
+		if ($key === null) {
+			return false;
+		}
+
+		$array = $this->getHeaders();
+		return isset($array[$key]) || array_key_exists($key, $array);
 	}
 
 	/**
 	 * Pushes a header value onto the headers array.
 	 *
-	 * @param  string $key   The header key.
-	 * @param  string $value The header value.
+	 * @param  string      $key   The header key.
+	 * @param  string|null $value The header value.
 	 * @return self
 	 */
-	public function pushHeader(string $key, string $value)
+	public function pushHeader(string $key, string $value = null)
 	{
 		$headers = $this->getHeaders();
 
