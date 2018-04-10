@@ -177,7 +177,7 @@ class HttpHandler extends AbstractProcessingHandler
 	 * @param  string|null $key The header key.
 	 * @return bool
 	 */
-	public function hasHeader(string $key = null)
+	public function hasHeader(string $key = null) : bool
 	{
 		if ($key === null) {
 			return false;
