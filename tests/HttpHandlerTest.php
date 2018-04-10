@@ -155,6 +155,22 @@ class HttpHandlerTest extends TestCase
 		$this->assertNull($this->handler->getHeader($nullKey));
 	}
 
+	public function testHasHeader()
+	{
+		$key = 'Content-Type';
+		$keyWithNullValue = 'foo';
+		$noneExistingKey = 'bar';
+		$nullKey = null;
+
+		$this->handler->pushHeader($key, 'abc');
+		$this->handler->pushHeader($keyWithNullValue, null);
+
+		$this->assertTrue($this->handler->hasHeader($key));
+		$this->assertTrue($this->handler->hasHeader($keyWithNullValue));
+		$this->assertFalse($this->handler->hasHeader($noneExistingKey));
+		$this->assertFalse($this->handler->hasHeader($nullKey));
+	}
+
 	public function testPushHeaderAndReturnsSelfInstance()
 	{
 		$key = 'Content-Type';
