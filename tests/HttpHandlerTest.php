@@ -36,7 +36,7 @@ class HttpHandlerTest extends TestCase
 	protected $handler;
 
 	/**
-	 * This method is run once for each test method and creates an instance of the HttpHandler.
+	 * This method is run once for each test method and creates an instance of the HttpHandler and MockClient.
 	 *
 	 * @return void
 	 */
@@ -242,8 +242,6 @@ class HttpHandlerTest extends TestCase
 
 	public function testSendHttpRequest()
 	{
-		$stub = $this->createMock(RequestInterface::class);
-
 		$log = new Logger('logger');
 
 		$this->handler->setUri('https://log.server/log/endpoint');
@@ -288,7 +286,7 @@ class HttpHandlerTest extends TestCase
 	}
 
 	/**
-	 * This method is run once after each test method and frees the HttpHandler instace.
+	 * This method is run once after each test method and frees the HttpHandler and MockClient instaces.
 	 *
 	 * @return void
 	 */

@@ -91,6 +91,16 @@ class HttpHandler extends AbstractProcessingHandler
 	}
 
 	/**
+	 * Gets the uri.
+	 *
+	 * @return string|null
+	 */
+	public function getUri()
+	{
+		return $this->options['uri'];
+	}
+
+	/**
 	 * Sets the uri.
 	 *
 	 * @param  string|null $uri Sets the http server uri or null to disable the {@see HttpHandler}.
@@ -104,13 +114,13 @@ class HttpHandler extends AbstractProcessingHandler
 	}
 
 	/**
-	 * Gets the uri.
+	 * Gets the http method.
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public function getUri()
+	public function getMethod() : string
 	{
-		return $this->options['uri'];
+		return $this->options['method'] ?? 'GET';
 	}
 
 	/**
@@ -127,13 +137,13 @@ class HttpHandler extends AbstractProcessingHandler
 	}
 
 	/**
-	 * Gets the http method.
+	 * Gets the headers.
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function getMethod() : string
+	public function getHeaders() : array
 	{
-		return $this->options['method'] ?? 'GET';
+		return $this->options['headers'] ?? [ 'Content-Type' => 'application/json' ];
 	}
 
 	/**
@@ -147,16 +157,6 @@ class HttpHandler extends AbstractProcessingHandler
 		$this->options['headers'] = $headers;
 
 		return $this;
-	}
-
-	/**
-	 * Gets the headers.
-	 *
-	 * @return array
-	 */
-	public function getHeaders() : array
-	{
-		return $this->options['headers'] ?? [ 'Content-Type' => 'application/json' ];
 	}
 
 	/**
@@ -206,6 +206,16 @@ class HttpHandler extends AbstractProcessingHandler
 	}
 
 	/**
+	 * Gets the http protocol version.
+	 *
+	 * @return string
+	 */
+	public function getProtocolVersion() : string
+	{
+		return $this->options['protocolVersion'] ?? '1.1';
+	}
+
+	/**
 	 * Sets the http protocol version.
 	 *
 	 * @param  string $version The http protocol version.
@@ -216,16 +226,6 @@ class HttpHandler extends AbstractProcessingHandler
 		$this->options['protocolVersion'] = $version;
 
 		return $this;
-	}
-
-	/**
-	 * Gets the http protocol version.
-	 *
-	 * @return string
-	 */
-	public function getProtocolVersion() : string
-	{
-		return $this->options['protocolVersion'] ?? '1.1';
 	}
 
 	/**
@@ -306,8 +306,10 @@ class HttpHandler extends AbstractProcessingHandler
 
     	try {
     		$this->getHttpClient()->sendRequest($request);
+    	/* istanbul ignore next */
     	} catch (\Exception $e) {
     		// QUESTION(msschl): How to handle the thrown exceptions???
+    		/* istanbul ignore next */
     		return;
     	}
     }
